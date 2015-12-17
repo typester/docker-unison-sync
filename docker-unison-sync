@@ -1,0 +1,52 @@
+#!/bin/sh
+
+set -e
+
+TARGET=$1
+
+if [ -z $TARGET ]; then
+    echo "Error: target path is required"
+    echo "Usage: $0 [target path]"
+    exit 1
+fi
+TARGET=$(realpath $TARGET)
+
+# /mnt/vda1/unison/Users/typester/dev/src/scratch/docker-unison-sync/
+SYNC_POINT=/mnt/vda1/unison
+
+# extract docker host
+DOCKER_IP=""
+if [ -z $DOCKER_HOST ]; then
+    echo "DOCKER_HOST isn't set"
+    exit 1
+else 
+    DOCKER_IP=$(echo $DOCKER_HOST | sed -e 's/^tcp:\/\///' | sed -e 's/:.*//')
+fi
+
+if [ -z $DOCKER_IP ]; then
+    echo "failed to extract docker host ip"
+    exit 1
+fi
+
+# start or restart unison-sync continer
+UNISON_CID=$(docker ps -a --filter "name=unison-sync" --format="{{.ID}}")
+if [ -z $UNISON_CID ]; then
+    echo "* Starting unison-sync container *"
+    UNISON_CID=$(docker run -d -v $SYNC_POINT:/unison -p 15000:5000 -e UNISON_VERSION=2.48.3 --name unison-sync leighmcculloch/unison)
+else
+    echo "* Restarting unison-sync container *"
+    docker restart $UNISON_CID
+fi
+
+# create snyc point directory
+docker exec unison-sync mkdir -p /unison$TARGET
+
+# first sync
+echo "* Executing first full sync *"
+echo "unison . socket://$DOCKER_IP:15000$SYNC_POINT$PWD -ignore 'Path .git' -auto -batch"
+unison . socket://$DOCKER_IP:15000$TARGET -ignore 'Path .git' -auto -batch
+
+# watch
+echo "* Watching file events *"
+fswatch -o . | xargs -n1 -I{} unison . socket://$DOCKER_IP:15000$TARGET -ignore 'Path .git' -auto -batch
+

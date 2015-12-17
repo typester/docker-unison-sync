@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+TARGET=$1
+
+if [ -z $TARGET ]; then
+    echo "Error: target path is required" >&2
+    echo "Usage: $0 [target path]" >&2
+    exit 1
+fi
+TARGET=$(realpath $TARGET)
+
+echo /mnt/vda1/unison$TARGET
