@@ -3,16 +3,16 @@
 Development process using Docker is awesome, but on OS X, there are some annoyed problems:
 
 1. `vboxfs` is too slow. that is used docker local file mount process by default.
-2. inotify event on container does not fired when a file change in osx.
+2. inotify event on container does not fired when a file is changed in osx.
 3. Using NFS instead of vboxfs is extreme faster than before but inotify event doesn't fired too.
 
-`docker-unison-sync` gives you to simple solution for this.
+`docker-unison-sync` gives you to simple and easy solution for this.
 There's already some solutions to solve these problems (See "See also" section).
 
 ## Install
 
 ```sh
-brew install https://raw.githubusercontent.com/typester/docker-unison-sync/master/docker-unison-sync.rb
+brew install --HEAD https://raw.githubusercontent.com/typester/docker-unison-sync/master/docker-unison-sync.rb
 ```
 
 ## Usage
