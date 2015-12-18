@@ -47,6 +47,13 @@ After running any sync process, synced files are remains on docker vm host. You 
 
 To clean these files, run `docker-unison-clean .`
 
+You can also manually cleanup unison synched files like following command:
+
+```sh
+docker run unison-sync rm -rf /unison/path/to/directory
+```
+
+`/path/to/directory` here is the path that was passed to `docker-unison-sync` before.
 
 # See also
 
