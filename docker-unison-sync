@@ -4,6 +4,10 @@ set -e
 
 TARGET=$1
 
+realpath() {
+    echo $(cd $@ && pwd -P)
+}
+
 if [ -z $TARGET ]; then
     echo "Error: target path is required"
     echo "Usage: $0 [target path]"
