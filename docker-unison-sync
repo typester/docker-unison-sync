@@ -47,8 +47,14 @@ docker exec unison-sync mkdir -p /unison$TARGET
 
 # first sync
 echo "* Executing first full sync *"
-echo "unison . socket://$DOCKER_IP:15000$SYNC_POINT$PWD -ignore 'Path .git' -auto -batch"
-unison . socket://$DOCKER_IP:15000$TARGET -ignore 'Path .git' -auto -batch
+N=0
+until [ $N -ge 5 ]
+do
+    unison . socket://$DOCKER_IP:15000$TARGET -ignore 'Path .git' -auto -batch && break
+    N=$[$N+1]
+    echo "* retry after a second ... *"
+    sleep 1
+done
 
 # watch
 echo "* Watching file events *"
